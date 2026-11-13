@@ -49,3 +49,13 @@ describe('guide accuracy', () => {
     expect(await r.text()).toBe('');
   });
 });
+
+describe('machine-readable', () => {
+  test('llms.txt and sitemap.xml are served', async () => {
+    const l = await handle(new Request('https://host.test/llms.txt'));
+    expect(l.status).toBe(200);
+    expect(await l.text()).toContain('/v1/hosts-catalog');
+    const m = await handle(new Request('https://host.test/sitemap.xml'));
+    expect(await m.text()).toContain('<loc>https://host.test/</loc>');
+  });
+});

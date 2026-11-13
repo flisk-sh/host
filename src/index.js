@@ -8,6 +8,16 @@ import { vaultReady } from './vault.js';
 import { connectProvider, createKey, disconnectProvider, getHost, listConnections, listHosts, listKeys, loginForKey, markHostRemoved, providerKey, recordHost, revokeKey } from './store.js';
 import { overMinuteLimit } from './limit.js';
 
+const LLMS = (o) => `# Host
+
+Free places to run your own agent pods, and a cabinet that starts a pod host (fleetd) with your own hosting-provider key. No money moves through Flisk.
+
+- Catalog of hosts and the catch for each (checked ${CHECKED}): ${o}/ and ${o}/v1/hosts-catalog (JSON)
+- Cabinet (GitHub sign-in): ${o}/console
+- API (Bearer host_ key): GET /v1/providers, GET|POST /v1/hosts {"provider": "..."}, GET|DELETE /v1/hosts/:id
+- Result: a credential token@https://address for the Fleet pod provider on https://fleet.flisk.si
+- Pods on these hosts are not sandboxes: trusted code only.
+`;
 const HEADERS = { 'content-type': 'text/html; charset=utf-8' };
 const html = (body, status = 200, extra = {}) => new Response(body, { status, headers: { ...HEADERS, ...extra } });
 const json = (status, body) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
@@ -65,6 +75,9 @@ export async function handle(request, env = {}, opts = {}) {
   // ---- public
   if (request.method === 'GET' && path === '/') return html(hostsPage(), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
+
+  if (request.method === 'GET' && path === '/sitemap.xml') return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url></urlset>\n`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+  if (request.method === 'GET' && path === '/llms.txt') return new Response(LLMS(origin), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 
   // ---- sign-in
   if (request.method === 'GET' && path === '/auth/start') {
