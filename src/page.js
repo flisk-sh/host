@@ -52,10 +52,10 @@ export function hostsPage() {
 <h2>Where</h2>
 <div class="hosts">${rows}</div>
 <p class="note">Checked ${esc(CHECKED)} from each vendor's public page and our own tries. Limits change: read the vendor's page before you rely on one. Pods on these hosts are not sandboxes: use them for your own agents, never for strangers' code.</p>
-<h2>Set up a Hugging Face Space in 4 steps</h2>
-<ol><li>Make a Space at <a href="https://huggingface.co/new-space">huggingface.co/new-space</a>, SDK <code>Docker</code>, free hardware, keep it public.</li>
-<li>Add <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code>:<pre>${esc(DOCKERFILE)}</pre></li>
-<li>In the Space settings add a secret <code>FLEETD_TOKEN</code>: any random string of 16 or more characters.</li>
-<li>In fleet, connect the provider <b>Fleet pod</b> with <code>token@https://your-name-your-space.hf.space</code>. Check it first: <code>curl https://your-name-your-space.hf.space/health</code> answers <code>{"ok":true}</code>.</li></ol>
+<h2>Set up fleetd on any Docker host in 4 steps</h2>
+<ol><li>Get a host that runs Docker and has a public https address (pick one above). Keep its address.</li>
+<li>Put <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code>:<pre>${esc(DOCKERFILE)}</pre></li>
+<li>In the host's settings add a secret <code>FLEETD_TOKEN</code>: any random string of 16 or more characters.</li>
+<li>In fleet, connect the provider <b>Fleet pod</b> with <code>token@https://your-host-address</code>. Check it first: <code>curl https://your-host-address/health</code> answers <code>{"ok":true}</code>.</li></ol>
 </div></body></html>`;
 }

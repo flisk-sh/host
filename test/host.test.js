@@ -12,10 +12,9 @@ describe('host.flisk.si', () => {
     expect(html.toLowerCase()).not.toContain('github actions');
     expect(JSON.stringify(HOSTS).toLowerCase()).not.toContain('actions');
   });
-  test('exactly one host is marked "use this", and it needs no card', () => {
-    const use = HOSTS.filter((h) => h.status === 'use');
-    expect(use.map((h) => h.id)).toEqual(['huggingface']);
-    expect(use[0].card).toBe(false);
+  test('no host is marked "use this" until a real run proved it; Hugging Face is paid', () => {
+    expect(HOSTS.filter((h) => h.status === 'use')).toEqual([]);
+    expect(HOSTS.find((h) => h.id === 'huggingface').status).toBe('paid');
   });
   test('/v1/hosts is JSON, other paths 404, writes are refused', async () => {
     expect((await (await get('/v1/hosts')).json()).hosts.length).toBe(HOSTS.length);

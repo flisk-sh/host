@@ -1,5 +1,5 @@
 // The free places a fleetd pod host can run, as checked on 2026-11-13 from each vendor's public page and our own tries.
-// status: use = works with no card and fleetd's rules; card = free but wants a card; paid = needs a paid plan;
+// status: use = proven to work with no card (none yet); card = free but wants a card; paid = needs a paid plan;
 //         limited = free but it stops or runs out; unchecked = not tested by us.
 export const CHECKED = '2026-11-13';
 
@@ -7,11 +7,11 @@ export const HOSTS = [
   {
     id: 'huggingface',
     name: 'Hugging Face Space',
-    status: 'use',
-    size: '2 vCPU, 16 GB, Docker',
+    status: 'paid',
+    size: 'Docker Spaces',
     card: false,
-    why: 'Free with no card. It has a public https address, so fleet can call it with no tunnel and no machine of yours.',
-    catch: 'Sleeps when idle. Pods share one container, so trusted code only.',
+    why: 'Free Spaces have a public https address, so fleet could call one with no tunnel. Hugging Face lists free CPU Spaces.',
+    catch: 'On a new free account on 2026-11-13 the Docker option and CPU Basic hardware were greyed out with a "Paid" badge, so we could not make one. Static and Gradio Spaces are free but cannot run fleetd.',
     url: 'https://huggingface.co/new-space',
   },
   {
