@@ -1,8 +1,8 @@
 import { HOSTS, LABEL, CHECKED } from './hosts.js';
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const CSS = `
+export const CSS = `
 :root{--paper:#f7f5e4;--card:#fffef6;--ink:#171715;--dim:#6b6a5f;--green:#16a34a;--red:#b42318;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--sans:'Inter Tight',system-ui,sans-serif;--serif:Fraunces,Georgia,serif}
 @media (prefers-color-scheme:dark){:root{--paper:#121210;--card:#1a1a17;--ink:#f1efe0;--dim:#a09f92;--green:#4ade80;--red:#f97066}}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
@@ -52,12 +52,22 @@ EXPOSE 7860
 CMD ["node", "fleetd.mjs"]`;
 
 // The standard Flisk second-level header (same as fleet's topbar in flisk-sh/fleet src/page.js): keep the two in step.
-const HOST_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="14" fill="#0b0b0d"/><rect x="12" y="14" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="27" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="40" width="40" height="10" rx="3" fill="#16a34a"/><circle cx="46" cy="45" r="2.5" fill="#0b0b0d"/></svg>';
-const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
+export const HOST_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="14" fill="#0b0b0d"/><rect x="12" y="14" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="27" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="40" width="40" height="10" rx="3" fill="#16a34a"/><circle cx="46" cy="45" r="2.5" fill="#0b0b0d"/></svg>';
+export const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
   `<div class="top m"><a class="brand" href="/" aria-label="${esc(name)} home"><span class="tile">${mark}</span><b>${esc(name)}</b></a>` +
   (sw.length ? `<div class="swp"><span aria-label="Flisk pod products">${sw.map(([href, label, on]) => `<a${on ? ' class="on" aria-current="true"' : ''} href="${esc(href)}"><i></i>${esc(label)}</a>`).join('')}</span></div>` : '') +
   `<nav aria-label="${esc(name)}">${nav.map(([href, label, cls = '']) => `<a${cls ? ` class="${cls}"` : ''} href="${esc(href)}"${href === current ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('')}</nav>` +
   `<a class="cta" href="${esc(cta[0])}">${esc(cta[1])} <i aria-hidden="true">→</i></a></div>`;
+
+export const SWITCH = (on) => [['https://fleet.flisk.si', 'fleet', on === 'fleet'], ['https://fleet.flisk.si/podlytics', 'podlytics'], ['/', 'host', on === 'host']];
+export const SITE_NAV = [['/#setup', 'Set up'], ['/console?section=docs', 'API'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']];
+export const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">';
+// A full page around `body`, with the standard header. Cabinet pages pass noindex.
+export const shell = ({ title, description = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>${description ? `\n<meta name="description" content="${esc(description)}">` : ''}${noindex ? '\n<meta name="robots" content="noindex">' : ''}
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E">
+${FONTS}<style>${CSS}${extraCss}</style><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
+${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
 
 export function hostsPage() {
   const rows = HOSTS.map(
@@ -71,7 +81,7 @@ export function hostsPage() {
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>${CSS}</style><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
-${topbar({ name: 'Host', mark: HOST_MARK, sw: [['https://fleet.flisk.si', 'fleet'], ['https://fleet.flisk.si/podlytics', 'podlytics'], ['/', 'host', true]], nav: [['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']], cta: ['#setup', 'Set up'] })}<div class="pad">
+${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Free places to run your own pods.</h1>
 <p class="lede">Fleet pods normally run on a paid sandbox provider. For your own, trusted agents you can run a pod host yourself on a free machine instead. These are the places we checked, and the catch for each.</p>
 <div class="fam"><div><b>inference</b><span>AI models</span></div><div><b>fleet</b><span>sandbox pods</span></div><div><b>host</b><span>free hosting for fleet pods</span></div></div>
