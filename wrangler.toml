@@ -2,5 +2,13 @@ name = "host"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
 
-# host.flisk.si on the flisk.si zone. No storage, no secrets: the page is built from src/hosts.js.
+# host.flisk.si on the flisk.si zone. D1 holds host keys, vaulted provider keys and host records.
 routes = [{ pattern = "host.flisk.si", custom_domain = true }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "host"
+database_id = "2a194096-d112-4786-a584-2e13d4e18750"
+
+[vars]
+PUBLIC_ORIGIN = "https://host.flisk.si"
