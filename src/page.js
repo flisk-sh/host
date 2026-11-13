@@ -8,8 +8,17 @@ const CSS = `
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans)}
 a{color:inherit}.m{font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;font-size:12px}
-.frame{max-width:980px;margin:0 auto;padding:0 16px 64px;border-left:1px solid var(--ink);border-right:1px solid var(--ink)}
-nav{display:flex;gap:20px;align-items:center;height:46px;border-bottom:1px solid var(--ink)}nav b{font-family:var(--mono)}
+.frame{max-width:980px;margin:0 auto;padding:0 0 64px;border-left:1px solid var(--ink);border-right:1px solid var(--ink)}.pad{padding:0 16px}
+.top{display:flex;align-items:stretch;border-bottom:1px solid var(--ink);height:56px;position:relative}
+.top .brand{display:flex;align-items:center;gap:11px;padding:0 20px;text-decoration:none;border-right:1px solid var(--ink);font:800 23px/1 var(--serif);letter-spacing:-.015em;text-transform:none}
+.top .tile{display:grid;place-items:center;width:34px;height:34px;flex-shrink:0}.top .tile svg{width:34px;height:34px}
+.top nav{display:flex;gap:26px;align-items:center;padding:0 20px;margin-left:auto}
+.top nav a{position:relative;text-decoration:none;padding:19px 0}
+.top nav a::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--green);transform:scaleX(0);transform-origin:left;transition:transform .18s}
+.top nav a:hover::after,.top nav a[aria-current]::after{transform:scaleX(1)}
+.top .cta{display:flex;align-items:center;gap:9px;padding:0 24px;background:var(--green);background-image:repeating-linear-gradient(135deg,transparent 0 7px,rgba(0,0,0,.07) 7px 10px);color:#04130a;font-weight:600;text-decoration:none;border-left:1px solid var(--ink)}
+.top .cta i{font-style:normal;display:inline-block;transition:transform .18s}.top .cta:hover i{transform:translateX(4px)}.top .cta:hover{background-color:#22c55e}
+@media (max-width:600px){.top .brand{padding:0 12px}.top .brand b{display:none}.top nav{gap:14px;padding:0 12px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}.top nav a{white-space:nowrap}.top .cta{padding:0 14px}}
 h1{font:800 clamp(34px,6vw,60px)/1.02 var(--serif);margin:48px 0 14px}h2{font:800 24px/1.1 var(--serif);margin:44px 0 12px}
 .lede{max-width:640px;color:var(--dim);font-size:17px}
 .fam{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--ink);margin:24px 0}.fam div{padding:14px;border-right:1px solid var(--ink)}.fam div:last-child{border:0}
@@ -33,6 +42,13 @@ ENV PORT=7860
 EXPOSE 7860
 CMD ["node", "fleetd.mjs"]`;
 
+// The standard Flisk second-level header (same as fleet's topbar in flisk-sh/fleet src/page.js): keep the two in step.
+const HOST_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="14" fill="#0b0b0d"/><rect x="12" y="14" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="27" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="40" width="40" height="10" rx="3" fill="#16a34a"/><circle cx="46" cy="45" r="2.5" fill="#0b0b0d"/></svg>';
+const topbar = ({ name, mark, nav, cta, current = '' }) =>
+  `<div class="top m"><a class="brand" href="/" aria-label="${esc(name)} home"><span class="tile">${mark}</span><b>${esc(name)}</b></a>` +
+  `<nav aria-label="${esc(name)}">${nav.map(([href, label, cls = '']) => `<a${cls ? ` class="${cls}"` : ''} href="${esc(href)}"${href === current ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('')}</nav>` +
+  `<a class="cta" href="${esc(cta[0])}">${esc(cta[1])} <i aria-hidden="true">→</i></a></div>`;
+
 export function hostsPage() {
   const rows = HOSTS.map(
     (h) => `<article class="h" id="${esc(h.id)}"><header><h3><a href="${esc(h.url)}" rel="noopener">${esc(h.name)}</a></h3><span class="tag ${esc(h.status)}">${esc(LABEL[h.status])}</span></header>
@@ -45,17 +61,17 @@ export function hostsPage() {
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>${CSS}</style><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
-<nav class="m"><b>host</b><a href="https://fleet.flisk.si">fleet</a><a href="https://inference.flisk.si">inference</a><a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">fleetd</a></nav>
+${topbar({ name: 'Host', mark: HOST_MARK, nav: [['https://fleet.flisk.si', 'Fleet'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']], cta: ['#setup', 'Set up'] })}<div class="pad">
 <h1>Free places to run your own pods.</h1>
 <p class="lede">Fleet pods normally run on a paid sandbox provider. For your own, trusted agents you can run a pod host yourself on a free machine instead. These are the places we checked, and the catch for each.</p>
 <div class="fam"><div><b>inference</b><span>AI models</span></div><div><b>fleet</b><span>sandbox pods</span></div><div><b>host</b><span>free hosting for fleet pods</span></div></div>
 <h2>Where</h2>
 <div class="hosts">${rows}</div>
 <p class="note">Checked ${esc(CHECKED)} from each vendor's public page and our own tries. Limits change: read the vendor's page before you rely on one. Pods on these hosts are not sandboxes: use them for your own agents, never for strangers' code.</p>
-<h2>Set up fleetd on any Docker host in 4 steps</h2>
+<h2 id="setup">Set up fleetd on any Docker host in 4 steps</h2>
 <ol><li>Get a host that runs Docker and has a public https address (pick one above). Keep its address.</li>
 <li>Put <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code>:<pre>${esc(DOCKERFILE)}</pre></li>
 <li>In the host's settings add a secret <code>FLEETD_TOKEN</code>: any random string of 16 or more characters.</li>
 <li>In fleet, connect the provider <b>Fleet pod</b> with <code>token@https://your-host-address</code>. Check it first: <code>curl https://your-host-address/health</code> answers <code>{"ok":true}</code>.</li></ol>
-</div></body></html>`;
+</div></div></body></html>`;
 }

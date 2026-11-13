@@ -26,3 +26,12 @@ describe('host.flisk.si', () => {
     expect([...html.matchAll(/<script[^>]*>/g)].map((m) => m[0])).toEqual(['<script src="https://flisk.si/assets/bar.js" defer>']);
   });
 });
+
+describe('standard header', () => {
+  test('brand, nav and the green call-to-action, same markup as fleet', async () => {
+    const html = await (await get('/')).text();
+    expect(html).toContain('<a class="brand" href="/"');
+    expect(html).toContain('<a class="cta" href="#setup">Set up');
+    expect(html).toContain('id="setup"');
+  });
+});
