@@ -36,3 +36,16 @@ describe('standard header', () => {
     expect(html).toContain('<a class="on" aria-current="true" href="/"><i></i>host</a>');
   });
 });
+
+describe('guide accuracy', () => {
+  test('the Dockerfile on the page makes fleetd reachable and the image is named', async () => {
+    const html = await (await handle(new Request('https://host.test/'))).text();
+    expect(html).toContain('HOST=0.0.0.0');
+    expect(html).toContain('ghcr.io/flisk-sh/fleetd:latest');
+  });
+  test('HEAD works like GET', async () => {
+    const r = await handle(new Request('https://host.test/', { method: 'HEAD' }));
+    expect(r.status).toBe(200);
+    expect(await r.text()).toBe('');
+  });
+});

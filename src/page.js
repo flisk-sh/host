@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 git cur
 USER node
 WORKDIR /home/node/app
 COPY --chown=node fleetd.mjs .
-ENV PORT=7860
+ENV PORT=7860 HOST=0.0.0.0
 EXPOSE 7860
 CMD ["node", "fleetd.mjs"]`;
 
@@ -90,7 +90,7 @@ ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta
 <p class="note">Checked ${esc(CHECKED)} from each vendor's public page and our own tries. Limits change: read the vendor's page before you rely on one. Pods on these hosts are not sandboxes: use them for your own agents, never for strangers' code.</p>
 <h2 id="setup">Set up fleetd on any Docker host in 4 steps</h2>
 <ol><li>Get a host that runs Docker and has a public https address (pick one above). Keep its address.</li>
-<li>Put <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code>:<pre>${esc(DOCKERFILE)}</pre></li>
+<li>Easiest: run the ready-made image <code>ghcr.io/flisk-sh/fleetd:latest</code> (port 7860). Or put <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code> in a folder and build it:<pre>${esc(DOCKERFILE)}</pre></li>
 <li>In the host's settings add a secret <code>FLEETD_TOKEN</code>: any random string of 16 or more characters.</li>
 <li>In fleet, connect the provider <b>Fleet pod</b> with <code>token@https://your-host-address</code>. Check it first: <code>curl https://your-host-address/health</code> answers <code>{"ok":true}</code>.</li></ol>
 </div></div></body></html>`;
