@@ -1,6 +1,6 @@
 // The free places a fleetd pod host can run, as checked on 2026-11-13 from each vendor's public page and our own tries.
 // status: use = works with no card and fleetd's rules; card = free but wants a card; paid = needs a paid plan;
-//         limited = free but it stops or runs out; unchecked = not tested by us; no = against the vendor's rules, do not.
+//         limited = free but it stops or runs out; unchecked = not tested by us.
 export const CHECKED = '2026-11-13';
 
 export const HOSTS = [
@@ -64,16 +64,6 @@ export const HOSTS = [
     catch: 'Needs the paid Workers plan.',
     url: 'https://developers.cloudflare.com/containers/',
   },
-  {
-    id: 'github-actions',
-    name: 'GitHub Actions',
-    status: 'no',
-    size: '2 vCPU, 7 GB, one job',
-    card: false,
-    why: 'Free minutes on public repos and a fresh VM per job.',
-    catch: "Not allowed: GitHub's terms forbid using Actions as general compute, and it would put the whole flisk-sh org at risk. A job also takes 10 to 30 s to start.",
-    url: 'https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#actions',
-  },
 ];
 
 export const LABEL = {
@@ -82,5 +72,4 @@ export const LABEL = {
   paid: 'Paid',
   limited: 'Limited',
   unchecked: 'Not tried',
-  no: 'Not allowed',
 };

@@ -16,9 +16,9 @@ h1{font:800 clamp(34px,6vw,60px)/1.02 var(--serif);margin:48px 0 14px}h2{font:80
 .fam b{display:block;font-family:var(--mono)}.fam span{color:var(--dim)}
 .hosts{display:grid;gap:0;border:1px solid var(--ink)}.h{padding:16px;border-bottom:1px solid var(--ink);background:var(--card)}.h:last-child{border:0}
 .h header{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}.h h3{margin:0;font-size:18px}
-.tag{font:500 11px/1 var(--mono);text-transform:uppercase;padding:4px 7px;border:1px solid var(--ink)}.tag.use{background:var(--green);color:#04130a;border-color:var(--green)}.tag.no{color:var(--red);border-color:var(--red)}
+.tag{font:500 11px/1 var(--mono);text-transform:uppercase;padding:4px 7px;border:1px solid var(--ink)}.tag.use{background:var(--green);color:#04130a;border-color:var(--green)}
 .h p{margin:6px 0 0}.h .c{color:var(--dim)}.h .sz{font-family:var(--mono);font-size:12px;color:var(--dim)}
-pre{background:#0a0a0e;color:#e8e8e0;padding:14px;overflow:auto;font:13px/1.5 var(--mono)}
+pre{background:#0a0a0e;color:#e8e8e0;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 var(--mono)}
 ol{padding-left:20px}li{margin:6px 0}code{font-family:var(--mono);font-size:13px}
 .note{color:var(--dim);font-size:13px;margin-top:28px}
 @media (max-width:640px){.fam{grid-template-columns:1fr}.fam div{border-right:0;border-bottom:1px solid var(--ink)}}
@@ -41,7 +41,7 @@ export function hostsPage() {
   ).join('\n');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>host: free places to run your own pods</title>
-<meta name="description" content="Where to run a fleetd pod host for free, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly, Cloudflare and GitHub Actions (not allowed).">
+<meta name="description" content="Where to run a fleetd pod host for free, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>${CSS}</style><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
