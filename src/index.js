@@ -51,7 +51,13 @@ export async function stopHost(env, login, ref, { fetchImpl = fetch, providers =
   return { ok: true };
 }
 
-export async function handle(request, env = {}, { providers = PROVIDERS, fetchImpl = fetch } = {}) {
+export async function handle(request, env = {}, opts = {}) {
+  // HEAD is GET without the body.
+  if (request.method === 'HEAD') {
+    const r = await handle(new Request(request.url, { method: 'GET', headers: request.headers }), env, opts);
+    return new Response(null, { status: r.status, headers: r.headers });
+  }
+  const { providers = PROVIDERS, fetchImpl = fetch } = opts;
   const url = new URL(request.url);
   const path = url.pathname;
   const origin = env.PUBLIC_ORIGIN || url.origin;
