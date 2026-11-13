@@ -17,7 +17,7 @@ describe('host.flisk.si', () => {
     expect(HOSTS.find((h) => h.id === 'huggingface').status).toBe('paid');
   });
   test('/v1/hosts is JSON, other paths 404, writes are refused', async () => {
-    expect((await (await get('/v1/hosts')).json()).hosts.length).toBe(HOSTS.length);
+    expect((await (await get('/v1/hosts-catalog')).json()).hosts.length).toBe(HOSTS.length);
     expect((await get('/nope')).status).toBe(404);
     expect((await handle(new Request('https://host.test/', { method: 'POST' }))).status).toBe(405);
   });
@@ -31,7 +31,7 @@ describe('standard header', () => {
   test('brand, nav and the green call-to-action, same markup as fleet', async () => {
     const html = await (await get('/')).text();
     expect(html).toContain('<a class="brand" href="/"');
-    expect(html).toContain('<a class="cta" href="#setup">Set up');
+    expect(html).toContain('<a class="cta" href="/console">Console');
     expect(html).toContain('id="setup"');
     expect(html).toContain('<a class="on" aria-current="true" href="/"><i></i>host</a>');
   });
