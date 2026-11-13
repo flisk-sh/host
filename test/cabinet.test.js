@@ -83,3 +83,17 @@ describe('cabinet', () => {
     expect(bad.status).toBe(403);
   });
 });
+
+describe('cabinet reloads', () => {
+  test('a result page URL still works on GET and escapes key names', async () => {
+    const env = mkEnv();
+    const c = await signIn(env);
+    for (const s of ['hosts', 'keys', 'providers']) {
+      const r = await get(env, c, `/console/${s}`);
+      expect(r.status).toBe(303);
+      expect(r.headers.get('location')).toBe(`/console?section=${s}`);
+    }
+    const out = await (await post(env, c, '/console/keys', { name: '<script>alert(1)</script>' })).text();
+    expect(out).not.toContain('<script>alert(1)</script>');
+  });
+});
