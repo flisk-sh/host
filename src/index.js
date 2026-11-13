@@ -102,6 +102,9 @@ export async function handle(request, env = {}, { providers = PROVIDERS, fetchIm
     const page = async (section, extra = {}) =>
       html(cabinetPage({ origin, login, section, canConnect, hosts: await listHosts(env, login), keys: await listKeys(env, login), connections: await listConnections(env, login), ...extra }), 200, { 'cache-control': 'no-store' });
     if (request.method === 'GET' && path === '/console') return page(url.searchParams.get('section') || 'overview');
+    // A result page (after Start, Connect, Create key) sits at /console/<section>; a reload must not 404.
+    const where = request.method === 'GET' && /^\/console\/(overview|hosts|providers|keys|docs)$/.exec(path);
+    if (where) return redirect(`/console?section=${where[1]}`);
     if (request.method === 'POST') {
       if (!sameOrigin(request, origin)) return html(messagePage('Not allowed', 'This form only works from host itself.'), 403);
       const form = await request.formData().catch(() => null);
