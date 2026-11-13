@@ -3,8 +3,9 @@ import demo from './demo.js';
 import render from './render.js';
 import fly from './fly.js';
 import koyeb from './koyeb.js';
+import northflank from './northflank.js';
 
-export const PROVIDERS = { render, fly, koyeb, demo };
+export const PROVIDERS = { render, fly, koyeb, northflank, demo };
 export const hostRef = (provider, id) => `host_${provider}_${id}`;
 export const parseRef = (ref) => {
   const m = /^host_([a-z0-9]+)_(.+)$/.exec(ref || '');

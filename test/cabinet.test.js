@@ -96,4 +96,20 @@ describe('cabinet reloads', () => {
     const out = await (await post(env, c, '/console/keys', { name: '<script>alert(1)</script>' })).text();
     expect(out).not.toContain('<script>alert(1)</script>');
   });
+
+  test('northflank connector sends the project and service, and removes the project on a failed address', async () => {
+    const { default: nf } = await import('../src/providers/northflank.js');
+    const seen = [];
+    const ok = async (url, init) => {
+      seen.push(`${init.method || 'GET'} ${url}`);
+      const body = url.endsWith('/projects') ? { data: { id: 'p1' } } : url.endsWith('/services/fleetd') ? { data: { ports: [{ dns: 'x.code.run' }] } } : {};
+      return new Response(JSON.stringify(body), { status: 200 });
+    };
+    expect(await nf.create('k', { name: 'h1', token: 't' }, { fetchImpl: ok })).toEqual({ id: 'p1', url: 'https://x.code.run' });
+    expect(seen[1]).toBe('POST https://api.northflank.com/v1/projects/p1/services/deployment');
+    const bad = async (url, init) => new Response(JSON.stringify(url.endsWith('/projects') ? { data: { id: 'p2' } } : { data: { ports: [] } }), { status: 200 });
+    const calls = [];
+    await expect(nf.create('k', { name: 'h2', token: 't' }, { fetchImpl: (u, i) => (calls.push(i.method || 'GET'), bad(u, i)) })).rejects.toThrow('no public address');
+    expect(calls.at(-1)).toBe('DELETE');
+  });
 });
