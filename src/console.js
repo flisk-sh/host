@@ -103,4 +103,6 @@ export function cabinetPage({ origin, login, section = 'overview', hosts = [], k
   });
 }
 
+// The same docs at /docs for signed-out visitors: the nav's API link must not send them to GitHub sign-in.
+export const docsPage = (origin) => shell({ title: 'Host API docs', description: 'Start, list and stop pod hosts with one API call.', body: `<div class="pad">${docsSection(origin)}<p class="note">Make a key on <a href="/console?section=keys">API keys</a> (GitHub sign-in).</p></div>` });
 export const messagePage = (title, text) => shell({ title, noindex: true, body: `<div class="pad"><h1 style="font:800 34px var(--serif);margin:40px 0 10px">${esc(title)}</h1><p>${esc(text)}</p><p><a href="/">Back to host</a></p></div>` });

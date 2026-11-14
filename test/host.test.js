@@ -64,3 +64,16 @@ describe('machine-readable', () => {
     expect(await m.text()).toContain('<loc>https://host.test/</loc>');
   });
 });
+
+describe('public API docs', () => {
+  test('the nav API link opens docs without sign-in', async () => {
+    const home = await (await get('/')).text();
+    expect(home).toContain('href="/docs"');
+    expect(home).not.toContain('/console?section=docs');
+    const res = await get('/docs');
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain('/v1/hosts');
+    expect(html).toContain('<title>Host API docs</title>');
+  });
+});
