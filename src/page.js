@@ -60,7 +60,7 @@ export const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
   `<a class="cta" href="${esc(cta[0])}">${esc(cta[1])} <i aria-hidden="true">→</i></a></div>`;
 
 export const SWITCH = (on) => [['https://fleet.flisk.si', 'fleet', on === 'fleet'], ['https://fleet.flisk.si/podlytics', 'podlytics'], ['/', 'host', on === 'host']];
-export const SITE_NAV = [['/#setup', 'Set up'], ['/console?section=docs', 'API'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']];
+export const SITE_NAV = [['/#setup', 'Set up'], ['/docs', 'API'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']];
 export const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">';
 // A full page around `body`, with the standard header. Cabinet pages pass noindex.
 export const shell = ({ title, description = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
