@@ -21,9 +21,14 @@ describe('host.flisk.si', () => {
     expect((await get('/nope')).status).toBe(404);
     expect((await handle(new Request('https://host.test/', { method: 'POST' }))).status).toBe(405);
   });
-  test('no script in the page except the shared Flisk bar', async () => {
+  test('the page loads Flisk Analytics in <head>', async () => {
     const html = await (await get('/')).text();
-    expect([...html.matchAll(/<script[^>]*>/g)].map((m) => m[0])).toEqual(['<script src="https://flisk.si/assets/bar.js" defer>']);
+    const head = html.slice(html.indexOf('<head>'), html.indexOf('</head>'));
+    expect(head).toContain('<script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script>');
+  });
+  test('no script in the page except the shared Flisk bar and Flisk Analytics', async () => {
+    const html = await (await get('/')).text();
+    expect([...html.matchAll(/<script[^>]*>/g)].map((m) => m[0])).toEqual(['<script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js">', '<script src="https://flisk.si/assets/bar.js" defer>']);
   });
 });
 
