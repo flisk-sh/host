@@ -61,6 +61,17 @@ describe('host.flisk.si', () => {
     const head = html.slice(html.indexOf('<head>'), html.indexOf('</head>'));
     expect(head).toContain('<script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script>');
   });
+  test('the home page preconnects to Google Fonts before loading the stylesheet', async () => {
+    const html = await (await get('/')).text();
+    const head = html.slice(html.indexOf('<head>'), html.indexOf('</head>'));
+    const google = '<link rel="preconnect" href="https://fonts.googleapis.com">';
+    const gstatic = '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
+    const stylesheet = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?';
+    expect(head).toContain(google);
+    expect(head).toContain(gstatic);
+    expect(head.indexOf(google)).toBeLessThan(head.indexOf(stylesheet));
+    expect(head.indexOf(gstatic)).toBeLessThan(head.indexOf(stylesheet));
+  });
   test('no script in the page except the shared Flisk bar and Flisk Analytics', async () => {
     const html = await (await get('/')).text();
     expect([...html.matchAll(/<script[^>]*>/g)].map((m) => m[0])).toEqual(['<script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js">', '<script src="https://flisk.si/assets/bar.js" defer>']);
