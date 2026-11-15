@@ -73,7 +73,7 @@ export async function handle(request, env = {}, opts = {}) {
   const origin = env.PUBLIC_ORIGIN || url.origin;
 
   // ---- public
-  if (request.method === 'GET' && path === '/') return html(hostsPage(), 200, { 'cache-control': 'public, max-age=300' });
+  if (request.method === 'GET' && path === '/') return html(hostsPage(origin), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && path === '/docs') return html(docsPage(origin), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
 

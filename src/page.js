@@ -62,22 +62,35 @@ export const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
 export const SWITCH = (on) => [['https://fleet.flisk.si', 'fleet', on === 'fleet'], ['https://fleet.flisk.si/podlytics', 'podlytics'], ['/', 'host', on === 'host']];
 export const SITE_NAV = [['/#setup', 'Set up'], ['/docs', 'API'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']];
 export const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">';
+const HOST_IMAGE = 'https://raw.githubusercontent.com/flisk-sh/flisk-emoji/main/apps/png/host-512.png';
+const headMetadata = ({ title, description = '', canonical = '', noindex = false }) =>
+  `<title>${esc(title)}</title>${description ? `\n<meta name="description" content="${esc(description)}">` : ''}${noindex ? '\n<meta name="robots" content="noindex">' : ''}` +
+  (canonical ? `
+<link rel="canonical" href="${esc(canonical)}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${esc(canonical)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:image" content="${HOST_IMAGE}">` : '');
 // A full page around `body`, with the standard header. Cabinet pages pass noindex.
-export const shell = ({ title, description = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)}</title>${description ? `\n<meta name="description" content="${esc(description)}">` : ''}${noindex ? '\n<meta name="robots" content="noindex">' : ''}
+export const shell = ({ title, description = '', canonical = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+${headMetadata({ title, description, canonical, noindex })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E">
 ${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
 
-export function hostsPage() {
+export function hostsPage(origin = 'https://host.flisk.si') {
   const rows = HOSTS.map(
     (h) => `<article class="h" id="${esc(h.id)}"><header><h3><a href="${esc(h.url)}" rel="noopener">${esc(h.name)}</a></h3><span class="tag ${esc(h.status)}">${esc(LABEL[h.status])}</span></header>
 <div class="sz">${esc(h.size)}${h.card === true ? ' · card needed' : h.card === false ? ' · no card' : ''}</div>
 <p>${esc(h.why)}</p><p class="c"><b>Catch:</b> ${esc(h.catch)}</p></article>`,
   ).join('\n');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>host: free places to run your own pods</title>
-<meta name="description" content="Where to run a fleetd pod host for free, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.">
+${headMetadata({
+    title: 'host: free places to run your own pods',
+    description: 'Where to run a fleetd pod host for free, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.',
+    canonical: new URL('/', origin).href,
+  })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">

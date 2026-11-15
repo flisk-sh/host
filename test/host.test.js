@@ -1,10 +1,45 @@
 import { describe, expect, test } from 'bun:test';
 import { handle } from '../src/index.js';
 import { HOSTS } from '../src/hosts.js';
+import { shell } from '../src/page.js';
 
 const get = (p) => handle(new Request(`https://host.test${p}`));
 
+async function headValues(url = 'https://host.flisk.si/', env = {}) {
+  const values = {};
+  const add = (key, value) => (values[key] ??= []).push(value);
+  await new HTMLRewriter()
+    .on('head link[rel="canonical"]', { element: (e) => add('canonical', e.getAttribute('href')) })
+    .on('head meta[property]', { element: (e) => add(e.getAttribute('property'), e.getAttribute('content')) })
+    .transform(await handle(new Request(url), env)).text();
+  return values;
+}
+
 describe('host.flisk.si', () => {
+  test.each([
+    ['canonical', 'https://host.flisk.si/'],
+    ['og:title', 'host: free places to run your own pods'],
+    ['og:description', 'Where to run a fleetd pod host for free, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.'],
+    ['og:image', 'https://raw.githubusercontent.com/flisk-sh/flisk-emoji/main/apps/png/host-512.png'],
+    ['og:url', 'https://host.flisk.si/'],
+    ['og:type', 'website'],
+  ])('the home head includes one %s value', async (key, value) => {
+    expect((await headValues())[key]).toEqual([value]);
+  });
+
+  test.each(['https://public.test', 'https://public.test/'])('canonical and Open Graph URLs follow public origin %s', async (origin) => {
+    const values = await headValues('https://preview.test/', { PUBLIC_ORIGIN: origin });
+    expect(values.canonical).toEqual(['https://public.test/']);
+    expect(values['og:url']).toEqual(['https://public.test/']);
+  });
+
+  test('shared head metadata escapes page text and canonical attributes', () => {
+    const html = shell({ title: 'Host & "pods"', description: 'A <guide>', canonical: 'https://host.flisk.si/?a=1&b=2', body: '' });
+    expect(html).toContain('<meta property="og:title" content="Host &amp; &quot;pods&quot;">');
+    expect(html).toContain('<meta property="og:description" content="A &lt;guide&gt;">');
+    expect(html).toContain('<link rel="canonical" href="https://host.flisk.si/?a=1&amp;b=2">');
+  });
+
   test('the page lists every host, and GitHub Actions is not offered (its terms forbid it)', async () => {
     const html = await (await get('/')).text();
     for (const h of HOSTS) expect(html).toContain(h.name);
