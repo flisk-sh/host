@@ -60,7 +60,7 @@ export const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
   `<a class="cta" href="${esc(cta[0])}">${esc(cta[1])} <i aria-hidden="true">→</i></a></div>`;
 
 export const SWITCH = (on) => [['https://fleet.flisk.si', 'fleet', on === 'fleet'], ['https://fleet.flisk.si/podlytics', 'podlytics'], ['/', 'host', on === 'host']];
-export const SITE_NAV = [['/#setup', 'Set up'], ['/docs', 'API'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']];
+export const SITE_NAV = [['/rating', 'Rating'], ['/#setup', 'Set up'], ['/docs', 'API'], ['https://inference.flisk.si', 'Inference'], ['https://github.com/flisk-sh/fleet/tree/main/fleetd', 'fleetd']];
 export const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">';
 const HOST_IMAGE = 'https://raw.githubusercontent.com/flisk-sh/flisk-emoji/main/apps/png/host-512.png';
 const headMetadata = ({ title, description = '', canonical = '', noindex = false }) =>
@@ -79,6 +79,47 @@ ${headMetadata({ title, description, canonical, noindex })}
 ${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
 
+const RATING_CSS = `
+.rt{width:100%;border-collapse:collapse;border:1px solid var(--ink);background:var(--card);font-size:14px}
+.rt th,.rt td{padding:9px 10px;border-bottom:1px solid var(--ink);text-align:left;vertical-align:top}
+.rt th{font:500 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.05em;background:var(--paper)}
+.rt td.n{font-family:var(--mono);text-align:right}.rt .sc{font:800 20px/1 var(--serif)}
+.rt tr.both td{background:color-mix(in srgb,var(--green) 12%,var(--card))}
+.y{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}.q{color:var(--dim)}
+.rt small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
+.wrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
+.flt{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 14px}.flt label{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--ink);padding:6px 10px;background:var(--card);cursor:pointer}
+@media (max-width:700px){.rt .hide{display:none}}
+`;
+const yn = (v, yes, no) => (v === true ? `<span class="y">${yes}</span>` : v === false ? `<span class="no">${no}</span>` : '<span class="q">?</span>');
+
+export function ratingPage(rows, rated) {
+  const body = rows
+    .map(
+      (s, i) => `<tr class="${s.card === false && s.link === true ? 'both' : ''}" data-card="${s.card === false ? 1 : 0}" data-link="${s.link === true ? 1 : 0}">
+<td class="n">${i + 1}</td><td><a href="${esc(s.url)}" rel="noopener"><b>${esc(s.name)}</b></a>${s.inFleet ? ' <span class="tag">in fleet</span>' : ''}<small>${esc(s.note || '')}</small></td>
+<td>${yn(s.card === null || s.card === undefined ? null : !s.card, 'No card', 'Card')}<small>${esc(s.credit || '')}</small></td>
+<td>${yn(s.link, 'Link', 'No link')}<small>${esc(s.linkHow || '')}</small></td>
+<td class="hide">${esc(s.price || '?')}</td><td class="n"><span class="sc">${s.score}</span></td></tr>`,
+    )
+    .join('\n');
+  return shell({
+    title: 'Sandbox rating: no card, with a link',
+    description: 'Hosted sandbox providers ranked by two things: can you start with no credit card, and does the sandbox give you a public link to your app.',
+    extraCss: RATING_CSS,
+    body: `<div class="pad">
+<h1>Sandboxes with no card and a link.</h1>
+<p class="lede">Every hosted sandbox we know, ranked by the two things that matter for a free pod: can you start <b>without a credit card</b>, and does the sandbox give you a <b>public link</b> to the app inside it, the way Upstash Box does. Green rows have both.</p>
+<div class="flt m"><label><input type="checkbox" id="fc"> No card only</label><label><input type="checkbox" id="fl"> Link only</label></div>
+<div class="wrap"><table class="rt"><thead><tr><th>#</th><th>Provider</th><th>Card</th><th>Sandbox link</th><th class="hide">2 vCPU · 4 GiB / h</th><th>Score</th></tr></thead><tbody>
+${body}
+</tbody></table></div>
+<p class="note">Score out of 100: no card 50, link 40, free credit up to 10 ($1 a point). "?" means the vendor's pages did not say; it scores less than a yes. Read from each vendor's own pricing, sign-up and docs pages on ${esc(rated)}, not tried by sign-up unless the provider is marked "in fleet". Inspired by <a href="https://orble.tech/sandboxes" rel="noopener">orble.tech/sandboxes</a>. As JSON: <a href="/v1/sandbox-rating">/v1/sandbox-rating</a>.</p>
+</div>
+<script>(()=>{const c=document.getElementById('fc'),l=document.getElementById('fl');const f=()=>document.querySelectorAll('.rt tbody tr').forEach(r=>{r.hidden=(c.checked&&r.dataset.card!=='1')||(l.checked&&r.dataset.link!=='1')});c.onchange=l.onchange=f})();</script>`,
+  });
+}
+
 export function hostsPage(origin = 'https://host.flisk.si') {
   const rows = HOSTS.map(
     (h) => `<article class="h" id="${esc(h.id)}"><header><h3><a href="${esc(h.url)}" rel="noopener">${esc(h.name)}</a></h3><span class="tag ${esc(h.status)}">${esc(LABEL[h.status])}</span></header>
@@ -96,7 +137,7 @@ ${headMetadata({
 <style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Free places to run your own pods.</h1>
-<p class="lede">Fleet pods normally run on a paid sandbox provider. For your own, trusted agents you can run a pod host yourself on a free machine instead. These are the places we checked, and the catch for each.</p>
+<p class="lede">Fleet pods normally run on a paid sandbox provider. For your own, trusted agents you can run a pod host yourself on a free machine instead. These are the places we checked, and the catch for each. Want a hosted sandbox instead? See the <a href="/rating">rating of sandboxes with no card and a link</a>.</p>
 <div class="fam"><div><b>inference</b><span>AI models</span></div><div><b>fleet</b><span>sandbox pods</span></div><div><b>host</b><span>free hosting for fleet pods</span></div></div>
 <h2>Where</h2>
 <div class="hosts">${rows}</div>

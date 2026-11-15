@@ -1,5 +1,6 @@
 import { HOSTS, CHECKED } from './hosts.js';
-import { hostsPage } from './page.js';
+import { ranked, RATED } from './rating.js';
+import { hostsPage, ratingPage } from './page.js';
 import { cabinetPage, docsPage, messagePage } from './console.js';
 import { PROVIDERS, hostRef, parseRef } from './providers/index.js';
 import { bearer, githubAuthorizeUrl, githubLogin, newToken } from './auth.js';
@@ -75,9 +76,11 @@ export async function handle(request, env = {}, opts = {}) {
   // ---- public
   if (request.method === 'GET' && path === '/') return html(hostsPage(origin), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && path === '/docs') return html(docsPage(origin), 200, { 'cache-control': 'public, max-age=300' });
+  if (request.method === 'GET' && (path === '/rating' || path === '/rating/')) return html(ratingPage(ranked(), RATED), 200, { 'cache-control': 'public, max-age=300' });
+  if (request.method === 'GET' && path === '/v1/sandbox-rating') return Response.json({ rated: RATED, sandboxes: ranked() }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
 
-  if (request.method === 'GET' && path === '/sitemap.xml') return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url><url><loc>${origin}/docs</loc></url></urlset>\n`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+  if (request.method === 'GET' && path === '/sitemap.xml') return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url><url><loc>${origin}/docs</loc></url><url><loc>${origin}/rating</loc></url></urlset>\n`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (request.method === 'GET' && path === '/llms.txt') return new Response(LLMS(origin), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 
   // ---- sign-in
