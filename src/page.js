@@ -74,7 +74,11 @@ const headMetadata = ({ title, description = '', canonical = '', noindex = false
 <meta property="og:url" content="${esc(canonical)}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
-<meta property="og:image" content="${HOST_IMAGE}">` : '');
+<meta property="og:image" content="${HOST_IMAGE}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="${HOST_IMAGE}">` : '');
 // A full page around `body`, with the standard header. Cabinet pages pass noindex.
 export const shell = ({ title, description = '', canonical = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 ${headMetadata({ title, description, canonical, noindex })}
