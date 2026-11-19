@@ -10,6 +10,12 @@ import { getDefaultProvider, setDefaultProvider, connectProvider, createKey, dis
 import { overMinuteLimit } from './limit.js';
 import { withSecurityHeaders } from './security-headers.js';
 
+const SECURITY_TXT = `Contact: https://github.com/flisk-sh/host/security/advisories/new
+Expires: 2027-06-01T00:00:00Z
+Preferred-Languages: en
+Canonical: https://host.flisk.si/.well-known/security.txt
+`;
+
 const LLMS = (o) => `# Host
 
 Free places to run your own agent pods, and a cabinet that starts a pod host (fleetd) with your own hosting-provider key. No money moves through Flisk.
@@ -81,6 +87,7 @@ export async function handle(request, env = {}, opts = {}) {
   if (request.method === 'GET' && path === '/v1/sandbox-rating') return Response.json({ rated: RATED, sandboxes: ranked() }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
 
+  if (request.method === 'GET' && path === '/.well-known/security.txt') return new Response(SECURITY_TXT, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=86400' } });
   if (request.method === 'GET' && path === '/sitemap.xml') return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url><url><loc>${origin}/docs</loc></url><url><loc>${origin}/rating</loc></url></urlset>\n`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (request.method === 'GET' && path === '/llms.txt') return new Response(LLMS(origin), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 
