@@ -66,8 +66,9 @@ export const SITE_NAV = [['/rating', 'Rating'], ['/#setup', 'Set up'], ['/docs',
 export const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">';
 export const FONT_PRECONNECT = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
 const HOST_IMAGE = 'https://raw.githubusercontent.com/flisk-sh/flisk-emoji/main/apps/png/host-512.png';
+const THEME_COLOR_META = '<meta name="theme-color" content="#f7f5e4"><meta name="theme-color" content="#f7f5e4" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#121210" media="(prefers-color-scheme: dark)">';
 const headMetadata = ({ title, description = '', canonical = '', noindex = false }) =>
-  `<title>${esc(title)}</title>${description ? `\n<meta name="description" content="${esc(description)}">` : ''}${noindex ? '\n<meta name="robots" content="noindex">' : ''}` +
+  `${THEME_COLOR_META}<title>${esc(title)}</title>${description ? `\n<meta name="description" content="${esc(description)}">` : ''}${noindex ? '\n<meta name="robots" content="noindex">' : ''}` +
   (canonical ? `
 <link rel="canonical" href="${esc(canonical)}">
 <meta property="og:type" content="website">
