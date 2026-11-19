@@ -9,6 +9,7 @@ import { vaultReady } from './vault.js';
 import { getDefaultProvider, setDefaultProvider, connectProvider, createKey, disconnectProvider, getHost, listConnections, listHosts, listKeys, loginForKey, markHostRemoved, providerKey, recordHost, revokeKey } from './store.js';
 import { overMinuteLimit } from './limit.js';
 import { withSecurityHeaders } from './security-headers.js';
+import { TOUCH_ICON_PNG } from './touch-icon.js';
 
 const LLMS = (o) => `# Host
 
@@ -81,6 +82,7 @@ export async function handle(request, env = {}, opts = {}) {
   if (request.method === 'GET' && path === '/v1/sandbox-rating') return Response.json({ rated: RATED, sandboxes: ranked() }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
 
+  if (request.method === 'GET' && path === '/apple-touch-icon.png') return new Response(TOUCH_ICON_PNG, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=86400' } });
   if (request.method === 'GET' && path === '/sitemap.xml') return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url><url><loc>${origin}/docs</loc></url><url><loc>${origin}/rating</loc></url></urlset>\n`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (request.method === 'GET' && path === '/llms.txt') return new Response(LLMS(origin), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 
