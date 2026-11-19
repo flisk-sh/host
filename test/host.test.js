@@ -103,6 +103,28 @@ describe('guide accuracy', () => {
 });
 
 describe('machine-readable', () => {
+  test('robots.txt points crawlers at the sitemap', async () => {
+    const res = await handle(new Request('https://host.test/robots.txt'));
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).toContain('Sitemap: https://host.test/sitemap.xml');
+    expect(body).toContain('# content signals:');
+  });
+
+  test('the sitemap URL advertised in robots.txt returns XML', async () => {
+    const robots = await (await handle(new Request('https://host.test/robots.txt'))).text();
+    const url = /^Sitemap: (\S+)$/m.exec(robots)?.[1];
+    expect(url).toBeTruthy();
+    const res = await handle(new Request(url));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('application/xml');
+  });
+
+  test('the Sitemap line follows PUBLIC_ORIGIN', async () => {
+    const res = await handle(new Request('https://preview.test/robots.txt'), { PUBLIC_ORIGIN: 'https://public.test' });
+    expect(await res.text()).toContain('Sitemap: https://public.test/sitemap.xml');
+  });
+
   test('llms.txt and sitemap.xml are served', async () => {
     const l = await handle(new Request('https://host.test/llms.txt'));
     expect(l.status).toBe(200);
