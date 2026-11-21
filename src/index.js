@@ -50,6 +50,8 @@ const CONTENT_SIGNALS = `# As a condition of accessing this website, you agree t
 `;
 const HEADERS = { 'content-type': 'text/html; charset=utf-8' };
 const html = (body, status = 200, extra = {}) => new Response(body, { status, headers: { ...HEADERS, ...extra } });
+const NOT_FOUND_HTML = '<!doctype html>\n<meta charset="utf-8">\n<title>Page not found</title>\n<p>Nothing lives at this address. <a href="/">Go home</a>.</p>\n';
+const notFound = () => html(NOT_FOUND_HTML, 404, { 'cache-control': 'public, max-age=300' });
 const json = (status, body) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
 const redirect = (to, extra = {}) => new Response(null, { status: 303, headers: { location: to, ...extra } });
 const safeNext = (n) => (/^\/console(\?[\w=&%.-]*)?$/.test(n || '') ? n : '/console');
@@ -200,7 +202,7 @@ export async function handle(request, env = {}, opts = {}) {
         return page('hosts', done.error ? { error: done.error } : { notice: 'Host stopped.' });
       }
     }
-    return html(messagePage('Page not found', 'Nothing lives at this address.'), 404);
+    return notFound();
   }
 
   // ---- API (Bearer host key)
@@ -233,7 +235,7 @@ export async function handle(request, env = {}, opts = {}) {
     return json(404, { error: 'not found' });
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } });
-  return html(messagePage('Page not found', 'Nothing lives at this address.'), 404);
+  return notFound();
 }
 
 export default { fetch: async (request, env) => withSecurityHeaders(await handle(request, env)) };
