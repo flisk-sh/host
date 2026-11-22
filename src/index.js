@@ -21,8 +21,38 @@ Free places to run your own agent pods, and a cabinet that starts a pod host (fl
 - Result: a credential token@https://address for the Fleet pod provider on https://fleet.flisk.si
 - Pods on these hosts are not sandboxes: trusted code only.
 `;
+// Cloudflare's zone-level content-signals notice is what host.flisk.si serves for /robots.txt today.
+// Keep it verbatim and append the Sitemap directive so crawlers that only read robots.txt find /sitemap.xml.
+const CONTENT_SIGNALS = `# As a condition of accessing this website, you agree to abide by the following
+# content signals:
+
+# (a)  If a content-signal = yes, you may collect content for the corresponding
+#      use.
+# (b)  If a content-signal = no, you may not collect content for the
+#      corresponding use.
+# (c)  If the website operator does not include a content signal for a
+#      corresponding use, the website operator neither grants nor restricts
+#      permission via content signal with respect to the corresponding use.
+
+# The content signals and their meanings are:
+
+# search:   building a search index and providing search results (e.g., returning
+#           hyperlinks and short excerpts from your website's contents). Search does not
+#           include providing AI-generated search summaries.
+# ai-input: inputting content into one or more AI models (e.g., retrieval
+#           augmented generation, grounding, or other real-time taking of content for
+#           generative AI search answers).
+# ai-train: training or fine-tuning AI models.
+
+# ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF
+# RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT
+# AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET.
+
+`;
 const HEADERS = { 'content-type': 'text/html; charset=utf-8' };
 const html = (body, status = 200, extra = {}) => new Response(body, { status, headers: { ...HEADERS, ...extra } });
+const NOT_FOUND_HTML = '<!doctype html>\n<meta charset="utf-8">\n<title>Page not found</title>\n<p>Nothing lives at this address. <a href="/">Go home</a>.</p>\n';
+const notFound = () => html(NOT_FOUND_HTML, 404, { 'cache-control': 'public, max-age=300' });
 const json = (status, body) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
 const redirect = (to, extra = {}) => new Response(null, { status: 303, headers: { location: to, ...extra } });
 const safeNext = (n) => (/^\/console(\?[\w=&%.-]*)?$/.test(n || '') ? n : '/console');
@@ -32,7 +62,7 @@ export async function startHost(env, login, provider, { fetchImpl = fetch, provi
   const adapter = providers[provider];
   if (!adapter) return { status: 400, error: `unknown provider "${provider}". Known: ${Object.keys(providers).join(', ')}` };
   const key = adapter.demo ? 'demo' : await providerKey(env, login, provider);
-  if (!key) return { status: 400, error: `connect ${adapter.label} on the Providers page first` };
+  if (!key) return { status: 400, error: `connect ${adapter.label} on the Hosts page first` };
   const token = newToken();
   const name = `fleetd-${newToken().slice(0, 8)}`;
   let made;
@@ -83,6 +113,7 @@ export async function handle(request, env = {}, opts = {}) {
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
 
   if (request.method === 'GET' && path === '/apple-touch-icon.png') return new Response(TOUCH_ICON_PNG, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=86400' } });
+  if (request.method === 'GET' && path === '/robots.txt') return new Response(`${CONTENT_SIGNALS}Sitemap: ${origin}/sitemap.xml\n`, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
   if (request.method === 'GET' && path === '/sitemap.xml') return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url><url><loc>${origin}/docs</loc></url><url><loc>${origin}/rating</loc></url></urlset>\n`, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (request.method === 'GET' && path === '/llms.txt') return new Response(LLMS(origin), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 
@@ -127,10 +158,10 @@ export async function handle(request, env = {}, opts = {}) {
     const canConnect = vaultReady(env);
     const page = async (section, extra = {}) =>
       html(cabinetPage({ origin, login, section, canConnect, hosts: await listHosts(env, login), defaultProvider: await getDefaultProvider(env, login), keys: await listKeys(env, login), connections: await listConnections(env, login), ...extra }), 200, { 'cache-control': 'no-store' });
-    if (request.method === 'GET' && path === '/console') return page(url.searchParams.get('section') || 'overview');
+    if (request.method === 'GET' && path === '/console') return page(url.searchParams.get('section') === 'providers' ? 'hosts' : url.searchParams.get('section') || 'overview');
     // A result page (after Start, Connect, Create key) sits at /console/<section>; a reload must not 404.
     const where = request.method === 'GET' && /^\/console\/(overview|hosts|providers|keys|docs)$/.exec(path);
-    if (where) return redirect(`/console?section=${where[1]}`);
+    if (where) return redirect(`/console?section=${where[1] === 'providers' ? 'hosts' : where[1]}`);
     // Same for the result page of Stop, which sits at /console/hosts/<id>/stop.
     if (request.method === 'GET' && /^\/console\/hosts\/[^/]+\/stop$/.test(path)) return redirect('/console?section=hosts');
     if (request.method === 'POST') {
@@ -173,7 +204,7 @@ export async function handle(request, env = {}, opts = {}) {
         return page('hosts', done.error ? { error: done.error } : { notice: 'Host stopped.' });
       }
     }
-    return html(messagePage('Page not found', 'Nothing lives at this address.'), 404);
+    return notFound();
   }
 
   // ---- API (Bearer host key)
@@ -206,7 +237,7 @@ export async function handle(request, env = {}, opts = {}) {
     return json(404, { error: 'not found' });
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } });
-  return html(messagePage('Page not found', 'Nothing lives at this address.'), 404);
+  return notFound();
 }
 
 export default { fetch: async (request, env) => withSecurityHeaders(await handle(request, env)) };

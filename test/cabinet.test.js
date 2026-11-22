@@ -86,7 +86,7 @@ describe('cabinet', () => {
     const env = mkEnv();
     const c = await signIn(env);
     const r = await post(env, c, '/console/hosts', { provider: 'fly' });
-    expect(await r.text()).toContain('Providers');
+    expect(await r.text()).toContain('connect Fly.io on the Hosts page first');
     const bad = await handle(new Request(`${O}/console/keys`, { method: 'POST', headers: { cookie: c, origin: 'https://evil.test' }, body: new URLSearchParams({ name: 'x' }) }), env);
     expect(bad.status).toBe(403);
   });
@@ -99,7 +99,7 @@ describe('cabinet reloads', () => {
     for (const s of ['hosts', 'keys', 'providers']) {
       const r = await get(env, c, `/console/${s}`);
       expect(r.status).toBe(303);
-      expect(r.headers.get('location')).toBe(`/console?section=${s}`);
+      expect(r.headers.get('location')).toBe(`/console?section=${s === 'providers' ? 'hosts' : s}`);
     }
     const out = await (await post(env, c, '/console/keys', { name: '<script>alert(1)</script>' })).text();
     expect(out).not.toContain('<script>alert(1)</script>');
