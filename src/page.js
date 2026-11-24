@@ -74,6 +74,8 @@ export const SITE_NAV = [['/rating', 'Rating'], ['/#setup', 'Set up'], ['/docs',
 export const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">';
 export const FONT_PRECONNECT = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
 const HOST_IMAGE = 'https://raw.githubusercontent.com/flisk-sh/flisk-emoji/main/apps/png/host-512.png';
+export const FAVICON_PATH = '/favicon.ico';
+const ICON_LINKS = `<link rel="icon" type="image/svg+xml" href="${FAVICON_PATH}"><link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
 const THEME_COLOR_META = '<meta name="theme-color" content="#f7f5e4"><meta name="theme-color" content="#f7f5e4" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#121210" media="(prefers-color-scheme: dark)">';
 const headMetadata = ({ title, description = '', canonical = '', noindex = false }) =>
   `${THEME_COLOR_META}<title>${esc(title)}</title>${description ? `\n<meta name="description" content="${esc(description)}">` : ''}${noindex ? '\n<meta name="robots" content="noindex">' : ''}` +
@@ -91,7 +93,7 @@ const headMetadata = ({ title, description = '', canonical = '', noindex = false
 // A full page around `body`, with the standard header. Cabinet pages pass noindex.
 export const shell = ({ title, description = '', canonical = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 ${headMetadata({ title, description, canonical, noindex })}
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+${ICON_LINKS}
 ${FONT_PRECONNECT}${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
 
@@ -148,7 +150,7 @@ ${headMetadata({
     description: 'Your AI agent needs a computer that stays on. A list of free ones, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.',
     canonical: new URL('/', origin).href,
   })}
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+${ICON_LINKS}
 ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">

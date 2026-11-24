@@ -1,6 +1,6 @@
 import { HOSTS, CHECKED } from './hosts.js';
 import { ranked, RATED } from './rating.js';
-import { esc, hostsPage, ratingPage } from './page.js';
+import { esc, FAVICON_PATH, hostsPage, ratingPage } from './page.js';
 import { cabinetPage, docsPage, messagePage } from './console.js';
 import { PROVIDERS, hostRef, parseRef } from './providers/index.js';
 import { bearer, githubAuthorizeUrl, githubLogin, newToken } from './auth.js';
@@ -11,6 +11,7 @@ import { overMinuteLimit } from './limit.js';
 import { withSecurityHeaders } from './security-headers.js';
 import { TOUCH_ICON_PNG } from './touch-icon.js';
 
+const FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="#22c55e"/></svg>';
 const SECURITY_TXT = `Contact: https://github.com/flisk-sh/host/security/advisories/new
 Expires: 2027-06-01T00:00:00Z
 Preferred-Languages: en
@@ -118,6 +119,7 @@ async function route(request, env = {}, opts = {}) {
   if (request.method === 'GET' && path === '/v1/sandbox-rating') return Response.json({ rated: RATED, sandboxes: ranked() }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
   if (request.method === 'GET' && path === '/v1/hosts-catalog') return Response.json({ checked: CHECKED, hosts: HOSTS }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
 
+  if (request.method === 'GET' && path === FAVICON_PATH) return new Response(FAVICON_SVG, { headers: { 'content-type': 'image/svg+xml', 'cache-control': 'public, max-age=86400' } });
   if (request.method === 'GET' && path === '/apple-touch-icon.png') return new Response(TOUCH_ICON_PNG, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=86400' } });
   if (request.method === 'GET' && path === '/.well-known/security.txt') return new Response(SECURITY_TXT, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=86400' } });
   if (request.method === 'GET' && path === '/robots.txt') return new Response(`${CONTENT_SIGNALS}Sitemap: ${origin}/sitemap.xml\n`, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
