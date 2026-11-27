@@ -2,6 +2,10 @@ import { HOSTS, LABEL, CHECKED } from './hosts.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+// First focusable element on every page: keyboard and screen-reader users jump
+// past the shared bar straight to the content (WCAG 2.4.1).
+export const SKIP_LINK = '<a class="skip" href="#main">Skip to content</a>';
+
 export const CSS = `
 :root{--paper:#f7f5e4;--card:#fffef6;--ink:#171715;--dim:#6b6a5f;--green:#16a34a;--red:#b42318;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--sans:'Inter Tight',system-ui,sans-serif;--serif:Fraunces,Georgia,serif}
 @media (prefers-color-scheme:dark){:root{--paper:#121210;--card:#1a1a17;--ink:#f1efe0;--dim:#a09f92;--green:#4ade80;--red:#f97066}}
@@ -9,6 +13,8 @@ export const CSS = `
 body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans)}
 a{color:inherit}.m{font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;font-size:12px}
 .frame{max-width:980px;margin:0 auto;padding:0 0 64px;border-left:1px solid var(--ink);border-right:1px solid var(--ink)}.pad{padding:0 16px}
+.skip{position:absolute;left:-9999px;top:0;z-index:10;padding:10px 16px;background:var(--ink);color:var(--paper);text-decoration:none}
+.skip:focus{left:0;top:0;outline:2px solid var(--green)}
 .top{display:flex;align-items:stretch;border-bottom:1px solid var(--ink);height:56px;position:relative}
 .top .brand{display:flex;align-items:center;padding:0 20px;text-decoration:none;border-right:1px solid var(--ink);font:800 23px/1 var(--serif);letter-spacing:-.015em;text-transform:none}
 .top .swp{display:flex;align-items:center;padding:0 14px;border-right:1px solid var(--ink)}
@@ -92,8 +98,8 @@ const headMetadata = ({ title, description = '', canonical = '', noindex = false
 export const shell = ({ title, description = '', canonical = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 ${headMetadata({ title, description, canonical, noindex })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
-${FONT_PRECONNECT}${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
-${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
+${FONT_PRECONNECT}${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body>${SKIP_LINK}<div class="frame">
+${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta })}<main id="main">${body}</main></div></body></html>`;
 
 const RATING_CSS = `
 .rt{width:100%;border-collapse:collapse;border:1px solid var(--ink);background:var(--card);font-size:14px}
@@ -150,8 +156,8 @@ ${headMetadata({
   })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-<style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
-${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
+<style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body>${SKIP_LINK}<div class="frame">
+${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<main id="main"><div class="pad">
 <h1>Run your AI agent for free.</h1>
 <p class="lede">Sign in to get a free key. It starts your AI agent on a free computer that stays on. Below, every free option we checked and its catch.</p>
 <p class="getkey"><a class="btn-key next-cta" data-next-cta href="${FREE_KEY_HREF}">Get a free API key</a><span>No card. Sign in with GitHub.</span></p>
@@ -172,5 +178,5 @@ ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'C
 <li>No account needed to try it: <code>bun scripts/bench-local.mjs</code> runs it against a fleetd on your own computer.</li>
 <li>For your own host or cloud: <code>FLEET_KEY=fleet_... PROVIDER=fleetpod PROVIDER_KEY=token@https://your-host-address bun scripts/bench-fanout.mjs</code>.</li></ol>
 <p class="note">Many pods at once is faster when your tasks do not depend on each other. Read the failed column too: a fast run that fails is not a result.</p>
-</div></div></body></html>`;
+</div></main></div></body></html>`;
 }
