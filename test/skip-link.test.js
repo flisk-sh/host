@@ -9,7 +9,8 @@ function firstFocusable(html) {
   const anchors = [...html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)];
   const body = html.indexOf('<body>');
   const first = anchors.find((m) => m.index > body);
-  return first ? { href: first[0].match(/href="([^"]*)"/)?.[1], text: first[1].replace(/<[^>]*>/g, '') } : null;
+  // The first anchor is the literal skip link, so its text is already plain.
+  return first ? { href: first[0].match(/href="([^"]*)"/)?.[1], text: first[1] } : null;
 }
 
 describe('skip to content', () => {
