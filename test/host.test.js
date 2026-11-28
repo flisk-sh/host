@@ -74,7 +74,7 @@ describe('host.flisk.si', () => {
   });
   test('no script in the page except the shared Flisk bar and Flisk Analytics', async () => {
     const html = await (await get('/')).text();
-    expect([...html.matchAll(/<script[^>]*>/g)].map((m) => m[0])).toEqual(['<script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js">', '<script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer>']);
+    expect([...html.matchAll(/<script[^>]*>/g)].map((m) => m[0])).toEqual(['<script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js">', '<script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-key-url="/console?section=keys" data-text="Free places to run your own agent pods." defer>']);
   });
 });
 
