@@ -1,1 +1,12 @@
-{ "name": "host", "private": true, "type": "module", "description": "host.flisk.si: where to run your own agent pods for free.", "scripts": { "test": "bun test", "dev": "bun scripts/dev.mjs" } }
+
+{
+  "name": "host",
+  "private": true,
+  "type": "module",
+  "description": "host.flisk.si: where to run your own agent pods for free.",
+  "license": "MIT",
+  "scripts": {
+    "test": "bun test",
+    "dev": "bun scripts/dev.mjs"
+  }
+}
