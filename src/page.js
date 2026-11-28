@@ -98,7 +98,7 @@ const headMetadata = ({ title, description = '', canonical = '', noindex = false
 export const shell = ({ title, description = '', canonical = '', body, extraCss = '', noindex = false, cta = ['/console', 'Console'] }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 ${headMetadata({ title, description, canonical, noindex })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
-${FONT_PRECONNECT}${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body>${SKIP_LINK}<div class="frame">
+${FONT_PRECONNECT}${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-key-url="/console?section=keys" data-text="Free places to run your own agent pods." defer></script></head><body>${SKIP_LINK}<div class="frame">
 ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta })}<main id="main">${body}</main></div></body></html>`;
 
 const RATING_CSS = `
@@ -156,7 +156,7 @@ ${headMetadata({
   })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-<style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-text="Free places to run your own agent pods." defer></script></head><body>${SKIP_LINK}<div class="frame">
+<style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-free-key data-key-url="/console?section=keys" data-text="Free places to run your own agent pods." defer></script></head><body>${SKIP_LINK}<div class="frame">
 ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<main id="main"><div class="pad">
 <h1>Run your AI agent for free.</h1>
 <p class="lede">Sign in to get a free key. It starts your AI agent on a free computer that stays on. Below, every free option we checked and its catch.</p>
